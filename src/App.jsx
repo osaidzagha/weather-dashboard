@@ -1,9 +1,11 @@
+import SearchBar from './components/SearchBar';
+import WeatherDisplay from './components/WeatherDisplay';
 function App() {
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-900">
-      <h1 className="text-4xl font-bold text-blue-400">
-        Tailwind is working! 🚀
-      </h1>
+    <div className="App">
+      <h1 className="text-2xl font-bold mb-4">Weather Dashboard</h1>
+      <SearchBar />
+      <WeatherDisplay />
     </div>
   );
 }
