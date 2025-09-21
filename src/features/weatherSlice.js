@@ -11,7 +11,7 @@ export const fetchWeather = createAsyncThunk(
     const geoResponse = await axios.get(geoUrl);
     if (!geoResponse.data.length) throw new Error('City not found');
 
-    const { lat, lon } = geoResponse.data[0];
+    const { lat, lon, name, country } = geoResponse.data[0];
 
     // 2️⃣ Get weather data
     const weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=minutely,alerts&appid=${apiKey}`;
@@ -21,6 +21,7 @@ export const fetchWeather = createAsyncThunk(
     console.log(weatherResponse.data);
 
     return {
+      location: geoResponse.data[0],
       current: weatherResponse.data.current,
       daily: weatherResponse.data.daily.slice(0, 5), // first 5 days
     };
@@ -32,6 +33,7 @@ const weatherSlice = createSlice({
   initialState: {
     current: null,
     daily: [],
+    location: null,
     loading: false,
     error: null,
   },
@@ -46,6 +48,7 @@ const weatherSlice = createSlice({
         state.loading = false;
         state.current = action.payload.current;
         state.daily = action.payload.daily;
+        state.location = action.payload.location;
       })
       .addCase(fetchWeather.rejected, (state, action) => {
         state.loading = false;

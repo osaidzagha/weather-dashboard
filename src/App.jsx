@@ -8,7 +8,6 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Fetch weather for a random city on first load
     const cities = ['London', 'New York', 'Tokyo', 'Paris', 'Sydney'];
     const randomCity = cities[Math.floor(Math.random() * cities.length)];
     dispatch(fetchWeather(randomCity));

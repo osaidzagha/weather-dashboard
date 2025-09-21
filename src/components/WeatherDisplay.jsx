@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 
 const WeatherDisplay = () => {
-  const { current, daily, loading, error } = useSelector(
+  const { current, daily, loading, error, location } = useSelector(
     (state) => state.weather
   );
 
@@ -14,6 +14,11 @@ const WeatherDisplay = () => {
 
   return (
     <div className="min-h-screen text-white flex flex-col items-center justify-start pt-20 px-4">
+      <div className="text-center mb-4">
+        <h2 className="text-3xl font-semibold">
+          {location?.name}, {location?.country}
+        </h2>
+      </div>
       {/* Current Weather */}
       <div className="text-center mb-16">
         <h1 className="text-6xl font-bold">{current.temp.toFixed(1)}°C</h1>
@@ -26,10 +31,13 @@ const WeatherDisplay = () => {
       </div>
 
       {/* 5-Day Forecast */}
-      <div className="w-full flex justify-between max-w-6xl">
+      <div className="w-full flex justify-between max-w-6xl flex-wrap gap-8">
         {daily.map((day, index) => (
-          <div key={index} className="flex flex-col items-center">
-            <p className="font-medium mb-2">
+          <div
+            key={index}
+            className="flex flex-col items-center w-36 md:w-40 lg:w-48"
+          >
+            <p className="font-medium mb-2 text-center">
               {new Date(day.dt * 1000).toLocaleDateString('en-US', {
                 weekday: 'short',
               })}
@@ -39,8 +47,12 @@ const WeatherDisplay = () => {
               alt={day.weather[0].description}
               className="w-24 h-24"
             />
-            <p className="font-bold mt-2">{day.temp.day.toFixed(1)}°C</p>
-            <p className="capitalize text-sm">{day.weather[0].description}</p>
+            <p className="font-bold mt-2 text-center">
+              {day.temp.day.toFixed(1)}°C
+            </p>
+            <p className="capitalize text-sm text-center">
+              {day.weather[0].description}
+            </p>
           </div>
         ))}
       </div>

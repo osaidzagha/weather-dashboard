@@ -14,7 +14,7 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto flex flex-col sm:flex-row gap-4 mb-8">
+    <div className="flex gap-2 mb-4 w-full max-w-3xl mx-auto">
       <input
         type="text"
         value={city}
