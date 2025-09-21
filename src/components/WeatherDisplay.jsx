@@ -13,7 +13,7 @@ const WeatherDisplay = () => {
   const getIcon = (icon) => `https://openweathermap.org/img/wn/${icon}@4x.png`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-400 to-blue-200 text-white flex flex-col items-center justify-start pt-20 px-4">
+    <div className="min-h-screen text-white flex flex-col items-center justify-start pt-20 px-4">
       {/* Current Weather */}
       <div className="text-center mb-16">
         <h1 className="text-6xl font-bold">{current.temp.toFixed(1)}°C</h1>
