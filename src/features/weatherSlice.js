@@ -34,6 +34,7 @@ const weatherSlice = createSlice({
     current: null,
     daily: [],
     location: null,
+    savedCities: [],
     loading: false,
     error: null,
   },

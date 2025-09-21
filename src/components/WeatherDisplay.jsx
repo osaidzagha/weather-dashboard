@@ -18,6 +18,12 @@ const WeatherDisplay = () => {
         <h2 className="text-3xl font-semibold">
           {location?.name}, {location?.country}
         </h2>
+        <button
+          onClick={() => dispatch(addSavedCity(location?.name))}
+          className="mt-2 px-4 py-2 bg-green-500 rounded hover:bg-green-600"
+        >
+          Save City
+        </button>
       </div>
       {/* Current Weather */}
       <div className="text-center mb-16">
