@@ -14,10 +14,9 @@ const App = () => {
   }, [dispatch]);
 
   return (
-    <div className="w-screen h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex flex-col items-center text-white">
-      <div className="mt-8 w-full max-w-4xl px-4">
-        <SearchBar />
-      </div>
+    <div className="w-screen h-screen bg-gradient-to-b from-blue-600 via-blue-500 to-blue-400 flex flex-col items-center pt-10 text-white">
+      <h1 className="text-4xl font-bold mb-8">SkySight</h1>
+      <SearchBar />
       <WeatherDisplay />
     </div>
   );
