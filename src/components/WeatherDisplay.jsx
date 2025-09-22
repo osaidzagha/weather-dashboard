@@ -1,67 +1,54 @@
-import { useSelector } from 'react-redux';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { addSavedCity } from '../features/cities/citiesSlice';
+import ForecastChart from './ForecastChart';
 
-const WeatherDisplay = () => {
-  const { current, daily, loading, error, location } = useSelector(
-    (state) => state.weather
-  );
+const WeatherDisplay = ({ data, compact = false }) => {
+  const dispatch = useDispatch();
+  if (!data) return null;
 
-  if (loading)
-    return <p className="text-center mt-10 text-gray-700">Loading...</p>;
-  if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
-  if (!current) return null;
+  const { current, daily, location } = data;
 
   const getIcon = (icon) => `https://openweathermap.org/img/wn/${icon}@4x.png`;
 
   return (
-    <div className="min-h-screen text-white flex flex-col items-center justify-start pt-20 px-4">
+    <div
+      className={`flex flex-col items-center justify-start p-4 rounded-xl shadow-md ${
+        compact ? 'bg-gray-800 w-60' : 'bg-gray-900 w-full min-h-screen'
+      } text-white`}
+    >
+      {/* City + Save button */}
       <div className="text-center mb-4">
-        <h2 className="text-3xl font-semibold">
+        <h2 className={`text-xl font-semibold ${compact ? '' : 'text-3xl'}`}>
           {location?.name}, {location?.country}
         </h2>
-        <button
-          onClick={() => dispatch(addSavedCity(location?.name))}
-          className="mt-2 px-4 py-2 bg-green-500 rounded hover:bg-green-600"
-        >
-          Save City
-        </button>
+        {!compact && (
+          <button
+            onClick={() => dispatch(addSavedCity(location?.name))}
+            className="mt-2 px-4 py-2 bg-green-500 rounded hover:bg-green-600"
+          >
+            Save City
+          </button>
+        )}
       </div>
+
       {/* Current Weather */}
-      <div className="text-center mb-16">
-        <h1 className="text-6xl font-bold">{current.temp.toFixed(1)}°C</h1>
-        <p className="text-2xl capitalize">{current.weather[0].description}</p>
+      <div className="text-center mb-4">
+        <h1 className={`font-bold ${compact ? 'text-2xl' : 'text-6xl'}`}>
+          {current.temp.toFixed(1)}°C
+        </h1>
+        <p className={`capitalize ${compact ? 'text-sm' : 'text-2xl'}`}>
+          {current.weather[0].description}
+        </p>
         <img
           src={getIcon(current.weather[0].icon)}
           alt={current.weather[0].description}
-          className="mx-auto mt-4"
+          className={`mx-auto ${compact ? 'w-16 h-16' : 'w-32 h-32'}`}
         />
       </div>
 
       {/* 5-Day Forecast */}
-      <div className="w-full flex justify-between max-w-6xl flex-wrap gap-8">
-        {daily.map((day, index) => (
-          <div
-            key={index}
-            className="flex flex-col items-center w-36 md:w-40 lg:w-48"
-          >
-            <p className="font-medium mb-2 text-center">
-              {new Date(day.dt * 1000).toLocaleDateString('en-US', {
-                weekday: 'short',
-              })}
-            </p>
-            <img
-              src={getIcon(day.weather[0].icon)}
-              alt={day.weather[0].description}
-              className="w-24 h-24"
-            />
-            <p className="font-bold mt-2 text-center">
-              {day.temp.day.toFixed(1)}°C
-            </p>
-            <p className="capitalize text-sm text-center">
-              {day.weather[0].description}
-            </p>
-          </div>
-        ))}
-      </div>
+      {!compact && daily && <ForecastChart forecast={daily} />}
     </div>
   );
 };
