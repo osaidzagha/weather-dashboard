@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import SearchBar from './components/SearchBar';
 import WeatherDisplay from './components/WeatherDisplay';
-import { fetchWeather } from './features/weatherSlice';
+import { fetchWeather } from './features/weather/weatherSlice';
 
 const App = () => {
   const dispatch = useDispatch();

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+// Async thunk to fetch weather for a city
 export const fetchWeather = createAsyncThunk(
   'weather/fetchWeather',
   async (city) => {
@@ -17,13 +18,10 @@ export const fetchWeather = createAsyncThunk(
     const weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=minutely,alerts&appid=${apiKey}`;
     const weatherResponse = await axios.get(weatherUrl);
 
-    // 3️⃣ Log the response for debugging
-    console.log(weatherResponse.data);
-
     return {
-      location: geoResponse.data[0],
+      location: { name, country },
       current: weatherResponse.data.current,
-      daily: weatherResponse.data.daily.slice(0, 5), // first 5 days
+      daily: weatherResponse.data.daily.slice(0, 5),
     };
   }
 );
@@ -31,10 +29,7 @@ export const fetchWeather = createAsyncThunk(
 const weatherSlice = createSlice({
   name: 'weather',
   initialState: {
-    current: null,
-    daily: [],
-    location: null,
-    savedCities: [],
+    weatherData: {}, // { cityName: { current, daily, location } }
     loading: false,
     error: null,
   },
@@ -46,10 +41,9 @@ const weatherSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchWeather.fulfilled, (state, action) => {
+        const cityName = action.payload.location.name;
+        state.weatherData[cityName] = action.payload;
         state.loading = false;
-        state.current = action.payload.current;
-        state.daily = action.payload.daily;
-        state.location = action.payload.location;
       })
       .addCase(fetchWeather.rejected, (state, action) => {
         state.loading = false;
