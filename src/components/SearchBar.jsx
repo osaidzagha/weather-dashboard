@@ -7,10 +7,16 @@ const SearchBar = () => {
   const dispatch = useDispatch();
 
   const handleSearch = () => {
-    if (city.trim() !== '') {
-      dispatch(fetchWeather(city));
+    const trimmedCity = city.trim();
+    if (trimmedCity !== '') {
+      dispatch(fetchWeather(trimmedCity));
+      if (onSearch) onSearch(trimmedCity);
       setCity('');
     }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') handleSearch();
   };
 
   return (
