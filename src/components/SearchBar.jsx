@@ -1,36 +1,32 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchWeather } from '../features/weatherSlice';
+import { fetchWeather } from '../features/weather/weatherSlice';
 
 const SearchBar = () => {
   const [city, setCity] = useState('');
   const dispatch = useDispatch();
 
   const handleSearch = () => {
-    const trimmedCity = city.trim();
-    if (trimmedCity !== '') {
-      dispatch(fetchWeather(trimmedCity));
-      if (onSearch) onSearch(trimmedCity);
+    const trimmed = city.trim();
+    if (trimmed !== '') {
+      dispatch(fetchWeather(trimmed));
       setCity('');
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') handleSearch();
-  };
-
   return (
-    <div className="flex gap-2 mb-4 w-full max-w-3xl mx-auto">
+    <div className="flex gap-2 mb-6 w-full max-w-xl mx-auto">
       <input
         type="text"
         value={city}
         onChange={(e) => setCity(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
         placeholder="Enter city"
-        className="flex-1 p-4 rounded-lg border border-gray-300 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+        className="flex-1 p-3 rounded-lg border border-gray-300 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
       <button
         onClick={handleSearch}
-        className="bg-blue-500 text-white px-6 py-4 rounded-lg shadow-md hover:bg-blue-600 transition"
+        className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-600"
       >
         Search
       </button>

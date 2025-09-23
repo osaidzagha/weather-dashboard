@@ -1,27 +1,38 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 
-// Async thunk to fetch weather for a city
+const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+
+// Async thunk to fetch both current + forecast
 export const fetchWeather = createAsyncThunk(
   'weather/fetchWeather',
   async (city) => {
-    const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
+    const currentRes = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+    );
+    const currentData = await currentRes.json();
 
-    // 1️⃣ Get latitude & longitude
-    const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${apiKey}`;
-    const geoResponse = await axios.get(geoUrl);
-    if (!geoResponse.data.length) throw new Error('City not found');
+    const forecastRes = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`
+    );
+    const forecastData = await forecastRes.json();
 
-    const { lat, lon, name, country } = geoResponse.data[0];
-
-    // 2️⃣ Get weather data
-    const weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=minutely,alerts&appid=${apiKey}`;
-    const weatherResponse = await axios.get(weatherUrl);
+    // Filter forecast → one entry per day (around 12:00)
+    const daily = forecastData.list.filter((item) =>
+      item.dt_txt.includes('12:00:00')
+    );
 
     return {
-      location: { name, country },
-      current: weatherResponse.data.current,
-      daily: weatherResponse.data.daily.slice(0, 5),
+      current: currentData.main
+        ? {
+            temp: currentData.main.temp,
+            weather: currentData.weather,
+          }
+        : null,
+      location: {
+        name: currentData.name,
+        country: currentData.sys?.country,
+      },
+      daily,
     };
   }
 );
@@ -29,7 +40,9 @@ export const fetchWeather = createAsyncThunk(
 const weatherSlice = createSlice({
   name: 'weather',
   initialState: {
-    weatherData: {}, // { cityName: { current, daily, location } }
+    current: null,
+    daily: [],
+    location: null,
     loading: false,
     error: null,
   },
@@ -41,13 +54,14 @@ const weatherSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchWeather.fulfilled, (state, action) => {
-        const cityName = action.payload.location.name;
-        state.weatherData[cityName] = action.payload;
         state.loading = false;
+        state.current = action.payload.current;
+        state.daily = action.payload.daily;
+        state.location = action.payload.location;
       })
       .addCase(fetchWeather.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch weather';
+        state.error = 'Failed to fetch weather';
       });
   },
 });
