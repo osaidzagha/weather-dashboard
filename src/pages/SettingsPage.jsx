@@ -17,7 +17,14 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-300">
+    <div
+      className="p-6 max-w-md mx-auto 
+        bg-white dark:bg-gray-900 
+        text-gray-800 dark:text-white 
+        rounded-xl shadow-xl 
+        
+        transition-colors duration-300"
+    >
       <h1 className="text-3xl font-bold mb-6">Settings</h1>
 
       {/* Username Section */}
@@ -27,7 +34,7 @@ const SettingsPage = () => {
           type="text"
           value={newUsername}
           onChange={(e) => setNewUsername(e.target.value)}
-          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-black dark:text-white"
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
           placeholder="Enter username"
         />
         <button
