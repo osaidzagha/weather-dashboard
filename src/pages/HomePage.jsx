@@ -10,10 +10,11 @@ const HomePage = () => {
   const username = useSelector((state) => state.user.username);
   const savedCities = useSelector((state) => state.cities.savedCities);
   const weatherData = useSelector((state) => state.weather.weatherData);
+  const loading = useSelector((state) => state.weather.loading);
+  const error = useSelector((state) => state.weather.error);
+  const [mainCity, setMainCity] = useState('Istanbul');
 
-  const [mainCity, setMainCity] = useState(null);
   const [previewCities, setPreviewCities] = useState([]);
-
   // Pick main city & 3 random previews
   useEffect(() => {
     if (savedCities.length > 0) {
@@ -34,7 +35,7 @@ const HomePage = () => {
 
   // Fetch main city weather if not available
   useEffect(() => {
-    if (mainCity && !weatherData[mainCity]) {
+    if (!weatherData[mainCity]) {
       dispatch(fetchWeather(mainCity));
     }
   }, [mainCity, weatherData, dispatch]);
@@ -50,10 +51,10 @@ const HomePage = () => {
   const handleSearchAdd = (city) => {
     const normalizedCity =
       city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
-    if (!savedCities.includes(normalizedCity)) {
-      dispatch(addSavedCity(normalizedCity));
-      dispatch(fetchWeather(normalizedCity));
-    }
+
+    dispatch(fetchWeather(normalizedCity));
+
+    setMainCity(normalizedCity);
   };
 
   return (
@@ -66,11 +67,19 @@ const HomePage = () => {
       <SearchBar onSearch={handleSearchAdd} />
 
       {/* Main City Detailed Display */}
-      {mainCity && weatherData[mainCity] && (
-        <WeatherDisplay data={weatherData[mainCity]} compact={false} />
+      {loading ? (
+        <p className="text-center text-white">Loading...</p>
+      ) : error ? (
+        <p className="text-center text-red-500">{error}</p>
+      ) : (
+        mainCity &&
+        weatherData[mainCity] && (
+          <WeatherDisplay data={weatherData[mainCity]} compact={false} />
+        )
       )}
 
       {/* 3 Random Preview Cities */}
+      {/* This section will continue to work since it already checks for weatherData existence */}
       {previewCities.length > 0 ? (
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {previewCities.map(

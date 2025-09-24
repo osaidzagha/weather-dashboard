@@ -40,9 +40,7 @@ export const fetchWeather = createAsyncThunk(
 const weatherSlice = createSlice({
   name: 'weather',
   initialState: {
-    current: null,
-    daily: [],
-    location: null,
+    weatherData: {},
     loading: false,
     error: null,
   },
@@ -55,10 +53,13 @@ const weatherSlice = createSlice({
       })
       .addCase(fetchWeather.fulfilled, (state, action) => {
         state.loading = false;
-        state.current = action.payload.current;
-        state.daily = action.payload.daily;
-        state.location = action.payload.location;
+        if (action.payload && action.payload.location?.name) {
+          const cityName = action.payload.location.name;
+          state.weatherData[cityName] = action.payload;
+        }
+        state.error = null;
       })
+
       .addCase(fetchWeather.rejected, (state, action) => {
         state.loading = false;
         state.error = 'Failed to fetch weather';

@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchWeather } from '../features/weather/weatherSlice';
 
-const SearchBar = () => {
+const SearchBar = ({ onSearch }) => {
   const [city, setCity] = useState('');
   const dispatch = useDispatch();
 
   const handleSearch = () => {
-    const trimmed = city.trim();
-    if (trimmed !== '') {
-      dispatch(fetchWeather(trimmed));
+    if (city.trim() !== '') {
+      onSearch(city.trim());
       setCity('');
     }
   };
