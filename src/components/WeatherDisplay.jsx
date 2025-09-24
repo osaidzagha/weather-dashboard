@@ -1,12 +1,9 @@
-// WeatherDisplay.jsx
 import { useDispatch } from 'react-redux';
 import { addSavedCity } from '../features/cities/citiesSlice';
 
 const WeatherDisplay = ({ data, compact = false }) => {
   const dispatch = useDispatch();
 
-  // The parent component handles loading/error states.
-  // We only render this component when we have valid data.
   if (!data) return null;
 
   const { current, daily, location } = data;
@@ -14,7 +11,7 @@ const WeatherDisplay = ({ data, compact = false }) => {
   const getIcon = (icon) => `https://openweathermap.org/img/wn/${icon}@2x.png`;
 
   return (
-    <div className={`text-center text-white ${compact ? 'p-3' : 'p-6'}`}>
+    <div className={`text-center ${compact ? 'p-3' : 'p-6'}`}>
       {/* City name */}
       <h2 className="text-2xl font-bold mb-2">
         {location?.name}, {location?.country}
