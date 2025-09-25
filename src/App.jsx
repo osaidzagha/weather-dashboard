@@ -21,7 +21,6 @@ const App = () => {
     <Router>
       <div className={appContainerClasses.trim()}>
         <nav className="flex justify-center gap-4 mb-6">
-          {/* Note: In light mode (blue-200), the default black text will be fine. */}
           <Link className="font-bold text-black dark:text-white" to="/">
             Home
           </Link>

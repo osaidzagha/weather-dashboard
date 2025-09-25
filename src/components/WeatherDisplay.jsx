@@ -36,7 +36,7 @@ const WeatherDisplay = ({ data, compact = false }) => {
         className="mx-auto"
       />
 
-      {/* Forecast (only if not compact) */}
+      {/* Forecast */}
       {!compact && (
         <div className="mt-6 flex flex-wrap justify-center gap-4">
           {daily.map((day, i) => (
