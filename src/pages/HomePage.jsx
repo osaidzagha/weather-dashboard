@@ -20,7 +20,7 @@ const HomePage = () => {
 
   const [mainCity, setMainCity] = useState('Istanbul');
   const [previewCities, setPreviewCities] = useState([]);
-
+  const [hasInitialized, setHasInitialized] = useState(false);
   useEffect(() => {
     if (location.state?.city && location.state.city !== mainCity) {
       setMainCity(location.state.city);
@@ -28,26 +28,28 @@ const HomePage = () => {
     }
   }, [location.state?.city, mainCity, navigate, location.pathname]);
 
-  // Random/Fallback City Selection Logic
   useEffect(() => {
-    let currentMain = mainCity;
+    if (!hasInitialized) {
+      let initialCity = 'Istanbul';
+      if (savedCities.length > 0) {
+        initialCity =
+          savedCities[Math.floor(Math.random() * savedCities.length)];
+      }
+      if (location.state?.city) {
+        setMainCity(location.state.city);
+      } else {
+        setMainCity(initialCity);
+      }
 
-    if (mainCity === 'Istanbul' && savedCities.length > 0) {
-      const randomCity =
-        savedCities[Math.floor(Math.random() * savedCities.length)];
-      setMainCity(randomCity);
-      currentMain = randomCity;
-    } else if (savedCities.length === 0 && mainCity !== 'Istanbul') {
-      setMainCity('Istanbul');
-      currentMain = 'Istanbul';
+      setHasInitialized(true);
     }
 
     const others = savedCities
-      .filter((c) => c !== currentMain)
+      .filter((c) => c !== mainCity)
       .sort(() => 0.5 - Math.random())
       .slice(0, 3);
     setPreviewCities(others);
-  }, [savedCities, mainCity]);
+  }, [savedCities, location.state?.city]);
 
   useEffect(() => {
     if (mainCity && !weatherData[mainCity]) {
