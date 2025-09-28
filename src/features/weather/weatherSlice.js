@@ -62,7 +62,7 @@ const weatherSlice = createSlice({
 
       .addCase(fetchWeather.rejected, (state, action) => {
         state.loading = false;
-        state.error = 'Failed to fetch weather';
+        state.error = 'City not found';
       });
   },
 });
