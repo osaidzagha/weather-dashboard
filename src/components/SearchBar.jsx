@@ -4,7 +4,6 @@ import { fetchWeather } from '../features/weather/weatherSlice';
 
 const SearchBar = ({ onSearch }) => {
   const [city, setCity] = useState('');
-  const dispatch = useDispatch();
 
   const handleSearch = () => {
     if (city.trim() !== '') {

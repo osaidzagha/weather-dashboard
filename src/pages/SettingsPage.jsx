@@ -1,50 +1,54 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setUsername, setTheme } from '../features/user/userSlice';
+import { setUsername } from '../features/user/userSlice';
+import ThemeToggle from '../components/ThemeToggle';
 
 const SettingsPage = () => {
   const dispatch = useDispatch();
   const username = useSelector((state) => state.user.username);
-  const theme = useSelector((state) => state.user.theme);
 
-  const [newUsername, setNewUsername] = useState(username);
+  const [newUsername, setNewUsername] = useState(username || '');
 
-  const handleUsernameChange = () => {
-    dispatch(setUsername(newUsername));
-  };
-
-  const toggleTheme = () => {
-    dispatch(setTheme(theme === 'light' ? 'dark' : 'light'));
+  const handleUsernameSave = () => {
+    if (newUsername.trim() !== '') {
+      dispatch(setUsername(newUsername.trim()));
+      alert('Username updated!');
+    }
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
+    <div
+      className="p-6 max-w-md mx-auto 
+        bg-white dark:bg-gray-900 
+        text-gray-800 dark:text-white 
+        rounded-xl shadow-xl 
+        
+        transition-colors duration-300"
+    >
       <h1 className="text-3xl font-bold mb-6">Settings</h1>
 
-      <div className="mb-4">
-        <label className="block mb-1">Username:</label>
+      {/* Username Section */}
+      <div className="mb-6">
+        <label className="block mb-1 font-semibold">Username:</label>
         <input
           type="text"
           value={newUsername}
           onChange={(e) => setNewUsername(e.target.value)}
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
+          placeholder="Enter username"
         />
         <button
-          onClick={handleUsernameChange}
-          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          onClick={handleUsernameSave}
+          className="mt-2 px-4 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded hover:bg-blue-600 dark:hover:bg-blue-700"
         >
           Save
         </button>
       </div>
 
-      <div className="mb-4">
-        <p>Theme: {theme}</p>
-        <button
-          onClick={toggleTheme}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-        >
-          Toggle Theme
-        </button>
+      {/* Theme Section */}
+      <div className="mb-6">
+        <h2 className="text-xl font-bold mb-2">Theme</h2>
+        <ThemeToggle />
       </div>
     </div>
   );
