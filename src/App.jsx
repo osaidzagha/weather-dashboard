@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/HomePage';
 import SettingsPage from './pages/SettingsPage';
 import SavedCitiesPage from './pages/SavedCitiesPage';
-import { useSelector } from 'react-redux';
 
 const App = () => {
   const theme = useSelector((state) => state.user.theme);
@@ -20,6 +21,8 @@ const App = () => {
   return (
     <Router>
       <div className={appContainerClasses.trim()}>
+        <Toaster position="top-right" />
+
         <nav className="flex justify-center gap-4 mb-6">
           <Link className="font-bold text-black dark:text-white" to="/">
             Home
