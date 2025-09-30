@@ -1,9 +1,4 @@
-import { useDispatch } from 'react-redux';
-import { addSavedCity } from '../features/cities/citiesSlice';
-
 const WeatherDisplay = ({ data, compact = false }) => {
-  const dispatch = useDispatch();
-
   if (!data) return null;
 
   const { current, daily, location } = data;

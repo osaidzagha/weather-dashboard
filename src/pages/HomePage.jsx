@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { useSelector, useDispatch } from 'react-redux';
 import SearchBar from '../components/SearchBar';
 import WeatherDisplay from '../components/WeatherDisplay';
 import { fetchWeather } from '../features/weather/weatherSlice';
 import { addSavedCity } from '../features/cities/citiesSlice';
-import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const HomePage = () => {
@@ -35,6 +35,7 @@ const HomePage = () => {
         initialCity =
           savedCities[Math.floor(Math.random() * savedCities.length)];
       }
+
       if (location.state?.city) {
         setMainCity(location.state.city);
       } else {
@@ -43,14 +44,15 @@ const HomePage = () => {
 
       setHasInitialized(true);
     }
+  }, [hasInitialized, savedCities, location.state]);
 
+  useEffect(() => {
     const others = savedCities
       .filter((c) => c !== mainCity)
       .sort(() => 0.5 - Math.random())
       .slice(0, 3);
     setPreviewCities(others);
-  }, [savedCities, location.state?.city]);
-
+  }, [savedCities, mainCity]);
   useEffect(() => {
     if (mainCity && !weatherData[mainCity]) {
       dispatch(fetchWeather(mainCity));

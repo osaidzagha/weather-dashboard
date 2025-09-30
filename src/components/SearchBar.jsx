@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { fetchWeather } from '../features/weather/weatherSlice';
 
 const SearchBar = ({ onSearch }) => {
   const [city, setCity] = useState('');
