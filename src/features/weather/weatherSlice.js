@@ -2,36 +2,65 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 
-// Async thunk to fetch both current + forecast
 export const fetchWeather = createAsyncThunk(
   'weather/fetchWeather',
-  async (city) => {
-    const currentRes = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
-    );
-    const currentData = await currentRes.json();
+  async ({ city, skipForecast = false }, { rejectWithValue }) => {
+    let currentData;
+    let daily = [];
 
-    const forecastRes = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`
-    );
-    const forecastData = await forecastRes.json();
+    try {
+      const currentRes = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+      );
+      currentData = await currentRes.json();
 
-    // Filter forecast → one entry per day (around 12:00)
-    const daily = forecastData.list.filter((item) =>
-      item.dt_txt.includes('12:00:00')
-    );
+      if (!currentRes.ok) {
+        return rejectWithValue({
+          city,
+          message: currentData.message || 'City not found',
+        });
+      }
+    } catch (networkError) {
+      return rejectWithValue({
+        city,
+        message:
+          networkError.message || 'Network error fetching current weather.',
+      });
+    }
+
+    if (!skipForecast) {
+      try {
+        const forecastRes = await fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`
+        );
+        if (forecastRes.ok) {
+          const forecastData = await forecastRes.json();
+          daily = forecastData.list.filter((item) =>
+            item.dt_txt.includes('12:00:00')
+          );
+        } else {
+          const errorText = await forecastRes.text();
+          console.warn(
+            `Forecast failed (Status ${forecastRes.status}) for ${currentData.name}: ${errorText}`
+          );
+        }
+      } catch (error) {
+        console.warn(
+          `Forecast network or parsing error for ${currentData.name}: ${error.message}`
+        );
+      }
+    }
 
     return {
-      current: currentData.main
-        ? {
-            temp: currentData.main.temp,
-            weather: currentData.weather,
-          }
-        : null,
+      current: {
+        temp: currentData.main.temp,
+        weather: currentData.weather,
+      },
       location: {
         name: currentData.name,
         country: currentData.sys?.country,
       },
+      inputCity: city,
       daily,
     };
   }
@@ -44,7 +73,11 @@ const weatherSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearWeatherError: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchWeather.pending, (state) => {
@@ -53,18 +86,21 @@ const weatherSlice = createSlice({
       })
       .addCase(fetchWeather.fulfilled, (state, action) => {
         state.loading = false;
-        if (action.payload && action.payload.location?.name) {
-          const cityName = action.payload.location.name;
-          state.weatherData[cityName] = action.payload;
-        }
+        const key = action.payload.inputCity;
+        state.weatherData[key] = action.payload;
         state.error = null;
       })
-
       .addCase(fetchWeather.rejected, (state, action) => {
         state.loading = false;
-        state.error = 'City not found';
+        const { city: rejectedCity, message } = action.payload || {};
+
+        if (rejectedCity) {
+          state.weatherData[rejectedCity] = { error: true };
+        }
+        state.error = message || 'City not found';
       });
   },
 });
 
+export const { clearWeatherError } = weatherSlice.actions;
 export default weatherSlice.reducer;

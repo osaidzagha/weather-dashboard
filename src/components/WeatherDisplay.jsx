@@ -41,9 +41,7 @@ const WeatherDisplay = ({ data, compact = false }) => {
                 alt="forecast"
                 className="mx-auto w-12 h-12"
               />
-              <p>
-                {day.temp?.day?.toFixed(1) || day.temp?.toFixed(1) || 'N/A'}°C
-              </p>
+              <p>{day.main?.temp?.toFixed(1) || 'N/A'}°C</p>
             </div>
           ))}
         </div>
