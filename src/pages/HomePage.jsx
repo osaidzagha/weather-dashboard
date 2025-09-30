@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import WeatherDisplay from '../components/WeatherDisplay';
 import { fetchWeather } from '../features/weather/weatherSlice';
 import { addSavedCity } from '../features/cities/citiesSlice';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { showSuccess, showError } from '../utils/toast';
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -21,6 +22,25 @@ const HomePage = () => {
   const [mainCity, setMainCity] = useState('Istanbul');
   const [previewCities, setPreviewCities] = useState([]);
   const [hasInitialized, setHasInitialized] = useState(false);
+
+  // Show error toast
+  useEffect(() => {
+    if (error) showError(error);
+  }, [error]);
+
+  // Initialize mainCity on first load
+  useEffect(() => {
+    if (hasInitialized) return;
+
+    let initialCity = savedCities.length
+      ? savedCities[Math.floor(Math.random() * savedCities.length)]
+      : 'Istanbul';
+
+    setMainCity(location.state?.city || initialCity);
+    setHasInitialized(true);
+  }, [hasInitialized, savedCities, location.state]);
+
+  // Update mainCity if location state changes
   useEffect(() => {
     if (location.state?.city && location.state.city !== mainCity) {
       setMainCity(location.state.city);
@@ -28,24 +48,7 @@ const HomePage = () => {
     }
   }, [location.state?.city, mainCity, navigate, location.pathname]);
 
-  useEffect(() => {
-    if (!hasInitialized) {
-      let initialCity = 'Istanbul';
-      if (savedCities.length > 0) {
-        initialCity =
-          savedCities[Math.floor(Math.random() * savedCities.length)];
-      }
-
-      if (location.state?.city) {
-        setMainCity(location.state.city);
-      } else {
-        setMainCity(initialCity);
-      }
-
-      setHasInitialized(true);
-    }
-  }, [hasInitialized, savedCities, location.state]);
-
+  // Set preview cities
   useEffect(() => {
     const others = savedCities
       .filter((c) => c !== mainCity)
@@ -53,23 +56,26 @@ const HomePage = () => {
       .slice(0, 3);
     setPreviewCities(others);
   }, [savedCities, mainCity]);
+
+  // Fetch weather for main city
   useEffect(() => {
     if (mainCity && !weatherData[mainCity]) {
       dispatch(fetchWeather(mainCity));
     }
   }, [mainCity, weatherData, dispatch]);
 
+  // Fetch weather for preview cities
   useEffect(() => {
     previewCities.forEach((city) => {
       if (!weatherData[city]) dispatch(fetchWeather(city));
     });
   }, [previewCities, weatherData, dispatch]);
 
+  // Handlers
   const handleSearchAdd = useCallback(
     (city) => {
       const normalizedCity =
         city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
-
       setMainCity(normalizedCity);
       dispatch(fetchWeather(normalizedCity));
     },
@@ -86,6 +92,7 @@ const HomePage = () => {
 
   const handleSaveCity = useCallback(() => {
     dispatch(addSavedCity(mainCity));
+    showSuccess(`${mainCity} saved!`);
   }, [dispatch, mainCity]);
 
   return (
@@ -93,6 +100,7 @@ const HomePage = () => {
       <h1 className="text-2xl font-bold mb-4">
         {username ? `Hello, ${username}!` : 'Welcome!'}
       </h1>
+
       <SearchBar onSearch={handleSearchAdd} />
 
       {loading && (
@@ -100,7 +108,7 @@ const HomePage = () => {
           Loading...
         </p>
       )}
-      {error && <p className="text-center text-red-500 mt-4">{error}</p>}
+
       {!loading && mainCity && weatherData[mainCity] && (
         <motion.div
           key={mainCity}
